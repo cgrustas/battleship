@@ -1,15 +1,19 @@
 /**
  * Represents a ship in the battleship game. Each ship includes a length,
  * the number of times they’ve been hit, and whether or not they’ve been sunk.
+ * @typedef {Object} Ship
+ * @property {number} length - the length of the ship
+ * @property {number} hits - the number of times the ship has been hit
  */
-export class Ship {
-  #length;
-  #hits;
-  #isSunk;
 
-  constructor(length) {
-    this.#length = length;
-    this.#hits = 0;
-    this.#isSunk = false;
-  }
+/**
+ * Creates a new ship with the specified length.
+ * @param {number} length - the length of the ship
+ * @returns {Ship} a new ship with no hits
+ */
+function createShip(length) {
+  return Object.freeze({
+    length,
+    hits: 0,
+  });
 }
