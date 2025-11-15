@@ -4,5 +4,5 @@
  * @returns {Object} The frozen object
  */
 export function freeze(obj) {
-  Object.freeze(obj);
+  return Object.freeze(obj);
 }
