@@ -12,6 +12,7 @@
  * @returns {Ship} a new ship with no hits
  */
 function createShip(length) {
+  if (length <= 0) throw new Error("Ship length must be positive");
   return Object.freeze({
     length,
     hits: 0,
