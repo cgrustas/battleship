@@ -1,4 +1,4 @@
-import { createShip, hit } from "../src/models/ship.js";
+import { createShip, hit, isSunk } from "../src/models/ship.js";
 
 describe("createShip", () => {
   test("creates a ship with a valid length", () => {
@@ -36,5 +36,23 @@ describe("hit", () => {
 
     const shipHitTwice = hit(shipHitOnce);
     expect(shipHitTwice.hits).toBe(2);
+  });
+});
+
+describe("isSunk", () => {
+  test("returns false when hits are less than length", () => {
+    const ship = createShip(2);
+    expect(isSunk(ship)).toBe(false);
+
+    const damagedShip = hit(ship);
+    expect(isSunk(damagedShip)).toBe(false);
+  });
+
+  test("returns true when hits are greater than or equal to length", () => {
+    const ship = createShip(2);
+
+    const damagedShip = hit(ship);
+    const sunkenShip = hit(damagedShip);
+    expect(isSunk(sunkenShip)).toBe(true);
   });
 });

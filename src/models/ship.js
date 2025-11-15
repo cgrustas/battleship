@@ -36,3 +36,13 @@ export function hit(ship) {
     hits: ship.hits + 1,
   });
 }
+
+/**
+ * Checks whether a ship is sunk. A ship is considered sunk if
+ * its length is less than or equal to the number of hits it has received.
+ * @param {Ship} ship - the ship to evaluate
+ * @returns {boolean} true if ship is sunk, false otherwise
+ */
+export function isSunk(ship) {
+  return ship.length <= ship.hits;
+}
