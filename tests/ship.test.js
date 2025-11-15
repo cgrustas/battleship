@@ -1,7 +1,7 @@
 import { createShip, hit } from "../src/models/ship.js";
 
-describe("Ship", () => {
-  test("hit()", () => {
+describe("hit", () => {
+  test("increments hit count", () => {
     const ship = createShip(3);
     expect(ship.hits).toBe(0);
 
