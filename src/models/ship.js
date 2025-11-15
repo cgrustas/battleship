@@ -7,9 +7,9 @@ export class Ship {
   #hits;
   #isSunk;
 
-  constructor(length, hits = 0, isSunk = false) {
+  constructor(length) {
     this.#length = length;
-    this.#hits = hits;
-    this.#isSunk = isSunk;
+    this.#hits = 0;
+    this.#isSunk = false;
   }
 }
