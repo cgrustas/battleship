@@ -12,11 +12,15 @@ import { freeze } from "../utils/functional.js";
  * Creates a new ship with the specified length.
  * @param {number} length - the length of the ship
  * @returns {Ship} a new ship with no hits
+ * @throws {TypeError} if ship length is not an integer
+ * @throws {RangeError} if ship length is less than 1 or greater than 5
  */
 export function createShip(length) {
-  if (length <= 0) throw new Error("Ship length must be positive");
+  if (!Number.isInteger(length)) throw new TypeError("Ship must be an integer");
+  if (length <= 0 || length > 5)
+    throw new RangeError("Ship length must be between 1 and 5 (inclusive)");
   return freeze({
-    length,
+    length: Math.floor(length),
     hits: 0,
   });
 }
