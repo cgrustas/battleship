@@ -1,3 +1,5 @@
+import { freeze } from "../utils/functional";
+
 /**
  * Represents a ship in the battleship game. Each ship includes a length,
  * the number of times they’ve been hit, and whether or not they’ve been sunk.
@@ -13,7 +15,7 @@
  */
 function createShip(length) {
   if (length <= 0) throw new Error("Ship length must be positive");
-  return Object.freeze({
+  return freeze({
     length,
     hits: 0,
   });
