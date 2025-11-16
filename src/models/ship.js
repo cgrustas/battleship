@@ -19,7 +19,8 @@ import { freeze } from "../utils/functional.js";
 export function createShip(id, length) {
   if (typeof id !== "string" || id.length === 0)
     throw new TypeError("Ship id must be a non-empty string");
-  if (!Number.isInteger(length)) throw new TypeError("Ship must be an integer");
+  if (!Number.isInteger(length))
+    throw new TypeError("Ship length must be an integer");
   if (length < 2 || length > 5)
     throw new RangeError("Ship length must be between 2 and 5 (inclusive)");
   return freeze({
@@ -49,4 +50,20 @@ export function hit(ship) {
  */
 export function isSunk(ship) {
   return ship.length <= ship.hits;
+}
+
+/**
+ * Validates a game board
+ * @param {GameBoard} ship - game board to validate
+ * @returns {void}
+ * @throws {TypeError}  if ship ID is not a string, or if ship length is not an integer
+ * @throws {RangeError} if ship length is less than 2 or greater than 5
+ */
+export function validateShip(ship) {
+  if (!ship || typeof ship.id !== "string" || ship.id.length === 0)
+    throw new TypeError("Ship id must be a non-empty string");
+  if (!Number.isInteger(ship.length))
+    throw new TypeError("Ship length must be an integer");
+  if (ship.length < 2 || ship.length > 5)
+    throw new RangeError("Ship length must be between 2 and 5 (inclusive)");
 }
