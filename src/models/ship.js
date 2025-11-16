@@ -10,17 +10,21 @@ import { freeze } from "../utils/functional.js";
 
 /**
  * Creates a new ship with the specified length.
+ * @param {string} id - title of the ship
  * @param {number} length - the length of the ship
  * @returns {Ship} a new ship with no hits
- * @throws {TypeError} if ship length is not an integer
- * @throws {RangeError} if ship length is less than 1 or greater than 5
+ * @throws {TypeError} if id is not a string, or if length is not an integer
+ * @throws {RangeError} if ship length is less than 2 or greater than 5
  */
-export function createShip(length) {
+export function createShip(id, length) {
+  if (typeof id !== "string" || id.length === 0)
+    throw new TypeError("Ship id must be a non-empty string");
   if (!Number.isInteger(length)) throw new TypeError("Ship must be an integer");
-  if (length <= 0 || length > 5)
-    throw new RangeError("Ship length must be between 1 and 5 (inclusive)");
+  if (length < 2 || length > 5)
+    throw new RangeError("Ship length must be between 2 and 5 (inclusive)");
   return freeze({
-    length: Math.floor(length),
+    id,
+    length,
     hits: 0,
   });
 }
