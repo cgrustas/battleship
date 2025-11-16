@@ -33,7 +33,7 @@ export function createGameBoard() {
  * Creates an empty cell for the game board.
  * @returns {Cell} empty cell that has not been attacked
  */
-export function createEmptyCell() {
+function createEmptyCell() {
   return freeze({
     shipID: null,
     isAttacked: false,
