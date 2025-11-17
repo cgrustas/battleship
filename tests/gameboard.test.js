@@ -72,51 +72,62 @@ describe("placeShip", () => {
   });
 
   describe("valid ship placement", () => {
-    // TEMP: testing through internals until public API is complete
-    test("places ship at top left corner", () => {
-      // test initial state
-      expect(emptyBoard.board[0][0].shipID).toBeNull();
-      expect(emptyBoard.board[0][1].shipID).toBeNull();
+    test("places ship at top left corner, horizontally", () => {
+      // test that board is empty
+      expect(areAllShipsSunk(emptyBoard)).toBe(true);
 
       // place ship at top left corner
-      const board = placeShip(emptyBoard, destroyer, [0, 0], true);
+      const board1 = placeShip(emptyBoard, destroyer, [0, 0], true);
 
-      // confirm that ship is held at top left corner
-      expect(board.board[0][0].shipID).toBe("destroyer");
-      expect(board.board[0][1].shipID).toBe("destroyer");
+      // test that board is not empty
+      expect(areAllShipsSunk(board1)).toBe(false);
+
+      // attack where the ship should be
+      const board2 = receiveAttack(board1, [0, 0]);
+      const board3 = receiveAttack(board2, [0, 1]);
+
+      // check if hits have registered
+      expect(getHits(board3)).toHaveLength(2);
+      expect(areAllShipsSunk(board3)).toBe(true);
     });
 
-    // TEMP: testing through internals until public API is complete
-    test("places ship at bottom right corner", () => {
-      // test initial state
-      expect(emptyBoard.board[9][8].shipID).toBeNull();
-      expect(emptyBoard.board[9][9].shipID).toBeNull();
+    test("places ship at bottom right corner, vertically", () => {
+      // test that board is empty
+      expect(areAllShipsSunk(emptyBoard)).toBe(true);
 
       // place ship at top left corner
-      const board = placeShip(emptyBoard, destroyer, [9, 8], true);
+      const board1 = placeShip(emptyBoard, destroyer, [8, 9], false);
 
-      // confirm that ship is held at top left corner
-      expect(board.board[9][8].shipID).toBe("destroyer");
-      expect(board.board[9][9].shipID).toBe("destroyer");
+      // test that board is not empty
+      expect(areAllShipsSunk(board1)).toBe(false);
+
+      // attack where the ship should be
+      const board2 = receiveAttack(board1, [8, 9]);
+      const board3 = receiveAttack(board2, [9, 9]);
+
+      // check if hits have registered
+      expect(getHits(board3)).toHaveLength(2);
+      expect(areAllShipsSunk(board3)).toBe(true);
     });
   });
 
   describe("ship tracking", () => {
-    // TEMP: testing through internals until public API is complete
     test("track multiple ships independently", () => {
-      const board1 = placeShip(
-        emptyBoard,
-        createShip("ship1", 2),
-        [0, 0],
-        true,
-      );
-      const board2 = placeShip(board1, createShip("ship2", 2), [1, 0], true);
+      const ship1 = createShip("ship1", 2);
 
-      const ship1ID = board2.board[0][0].shipID;
-      const ship2ID = board2.board[1][0].shipID;
+      const board1 = placeShip(emptyBoard, ship1, [0, 0], true);
+      // sinking ship 1 should make all ships sunk
+      const board2 = receiveAttack(board1, [0, 0]);
+      const board3 = receiveAttack(board2, [0, 1]);
+      expect(getHits(board3)).toHaveLength(2);
+      expect(areAllShipsSunk(board3)).toBe(true);
 
-      expect(ship1ID).toBe("ship1");
-      expect(ship2ID).toBe("ship2");
+      // adding a new ship should preserve ship1's position,
+      // but now the board's ships are not all sunk
+      const ship2 = createShip("ship2", 3);
+      const board4 = placeShip(board3, ship2, [1, 0], true);
+      expect(getHits(board4)).toHaveLength(2);
+      expect(areAllShipsSunk(board4)).toBe(false);
     });
   });
 });
@@ -151,7 +162,6 @@ describe("receiveAttack", () => {
   });
 
   describe("hit/miss tracking", () => {
-    // TEMP: testing through internals until public API is complete
     test("records attack on empty cell as miss", () => {
       // test initial board state
       expect(getMisses(emptyBoard)).not.toContainEqual([0, 0]);
@@ -163,7 +173,6 @@ describe("receiveAttack", () => {
       expect(getMisses(board)).toContainEqual([0, 0]);
     });
 
-    // TEMP: testing through internals until public API is complete
     test("records attack on ship cell as hit", () => {
       // test initial board state
       const board1 = placeShip(emptyBoard, destroyer, [0, 0], true);
@@ -176,7 +185,6 @@ describe("receiveAttack", () => {
       expect(getHits(board2)).toContainEqual([0, 0]);
     });
 
-    // TEMP: testing through internals until public API is complete
     test("accumulates multiple attacks", () => {
       expect(getMisses(emptyBoard)).toHaveLength(0);
 
@@ -189,32 +197,25 @@ describe("receiveAttack", () => {
   describe("ship damage", () => {
     // TEMP: testing through internals until public API is complete
     test("increments hit count on correct ship", () => {
+      // attacking a 2-length ship once should increment, not sink the ship
       const board1 = placeShip(emptyBoard, destroyer, [0, 0], true);
-      expect(board1.ships.get("destroyer").hits).toBe(0);
-
       const board2 = receiveAttack(board1, [0, 0]);
-      expect(board2.ships.get("destroyer").hits).toBe(1);
+      expect(areAllShipsSunk(board2)).toBe(false);
+
+      // attacking twice should sink the ship
+      const board3 = receiveAttack(board2, [0, 1]);
+      expect(areAllShipsSunk(board3)).toBe(true);
     });
 
-    test("does not increment hit count on miss", () => {
+    test("missing a ship doesn't affect its sink status", () => {
       const board1 = placeShip(emptyBoard, destroyer, [0, 0], true);
-      expect(board1.ships.get("destroyer").hits).toBe(0);
+      const board2 = receiveAttack(board1, [5, 5]); // miss
+      const board3 = receiveAttack(board2, [0, 0]); // hit once
 
-      const board2 = receiveAttack(board1, [5, 5]);
-      expect(board2.ships.get("destroyer").hits).toBe(0);
-    });
+      expect(areAllShipsSunk(board3)).toBe(false); // still needs one more hit
 
-    // TEMP: testing through internals until public API is complete
-    test("damages correct ship when multiple ships on board", () => {
-      const board1 = placeShip(emptyBoard, destroyer, [0, 0], true);
-      const board2 = placeShip(board1, createShip("carrier", 5), [1, 0], true);
-      expect(board2.ships.get("destroyer").hits).toBe(0);
-      expect(board2.ships.get("carrier").hits).toBe(0);
-
-      const board3 = receiveAttack(board2, [0, 0]);
-
-      expect(board3.ships.get("destroyer").hits).toBe(1);
-      expect(board3.ships.get("carrier").hits).toBe(0);
+      const board4 = receiveAttack(board3, [0, 1]); // hit twice
+      expect(areAllShipsSunk(board4)).toBe(true); // now sunk with exactly 2 hits
     });
   });
 });
