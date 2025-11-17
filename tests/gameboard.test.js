@@ -1,140 +1,276 @@
 import { createShip } from "../src/models/ship";
 import {
   createGameBoard,
-  getShipIDAt,
   placeShip,
-} from "../src/models/gameboard";
+  receiveAttack,
+  getHits,
+  getMisses,
+} from "../src/models/gameBoard.js";
 
-let gameBoard;
+let emptyBoard;
 let destroyer;
-let topLeftPos;
-let isHorizontal;
-let gameBoardWithShip;
 
 beforeEach(() => {
-  gameBoard = createGameBoard();
+  emptyBoard = createGameBoard();
   destroyer = createShip("destroyer", 2);
-  topLeftPos = [0, 0];
-  isHorizontal = true;
-  gameBoardWithShip = placeShip(gameBoard, destroyer, topLeftPos, isHorizontal);
-});
-
-describe("createGameBoard", () => {
-  test("creates 10x10 empty game board with valid positions", () => {
-    for (let row = 0; row < 10; row++) {
-      for (let col = 0; col < 10; col++) {
-        expect(getShipIDAt(gameBoard, [row, col])).toBeNull();
-      }
-    }
-  });
-});
-
-describe("getShipIDAt", () => {
-  test("handles invalid position types", () => {
-    expect(() => getShipIDAt(gameBoard, null)).toThrow(TypeError);
-    expect(() => getShipIDAt(gameBoard, "0,0")).toThrow(TypeError);
-  });
-
-  test("handles out of bounds positions", () => {
-    expect(() => getShipIDAt(gameBoard, [-1, 0])).toThrow(RangeError);
-    expect(() => getShipIDAt(gameBoard, [10, 0])).toThrow(RangeError);
-    expect(() => getShipIDAt(gameBoard, [0, -1])).toThrow(RangeError);
-    expect(() => getShipIDAt(gameBoard, [0, 10])).toThrow(RangeError);
-  });
 });
 
 describe("placeShip", () => {
   describe("input type validation", () => {
     test("handles invalid board", () => {
-      expect(() =>
-        placeShip(null, destroyer, topLeftPos, isHorizontal),
-      ).toThrow(TypeError);
+      expect(() => placeShip(null, destroyer, [0, 0], true)).toThrow(TypeError);
     });
     test("handles invalid ship", () => {
-      expect(() =>
-        placeShip(gameBoard, null, topLeftPos, isHorizontal),
-      ).toThrow(TypeError);
+      expect(() => placeShip(emptyBoard, null, [0, 0], true)).toThrow(
+        TypeError,
+      );
     });
     test("handles invalid starting position type", () => {
-      expect(() => placeShip(gameBoard, destroyer, null, isHorizontal)).toThrow(
+      expect(() => placeShip(emptyBoard, destroyer, null, true)).toThrow(
         TypeError,
       );
     });
     test("handles invalid orientation", () => {
-      expect(() => placeShip(gameBoard, destroyer, topLeftPos, null)).toThrow(
+      expect(() => placeShip(emptyBoard, destroyer, [0, 0], null)).toThrow(
         TypeError,
       );
     });
   });
 
   describe("invalid ship placement", () => {
+    let boardWithShip;
+    beforeEach(() => {
+      boardWithShip = placeShip(emptyBoard, destroyer, [0, 0], true);
+    });
+
     test("overflows board-bottom", () => {
-      expect(() =>
-        placeShip(gameBoard, destroyer, [9, 0], !isHorizontal),
-      ).toThrow(RangeError);
+      expect(() => placeShip(emptyBoard, destroyer, [9, 0], false)).toThrow(
+        RangeError,
+      );
     });
     test("overflows board-right", () => {
-      expect(() =>
-        placeShip(gameBoard, destroyer, [0, 9], isHorizontal),
-      ).toThrow(RangeError);
+      expect(() => placeShip(emptyBoard, destroyer, [0, 9], true)).toThrow(
+        RangeError,
+      );
     });
     test("overlays existing ship", () => {
-      expect(() =>
-        placeShip(gameBoardWithShip, destroyer, [0, 1], isHorizontal),
-      ).toThrow(Error);
+      expect(() => placeShip(boardWithShip, destroyer, [0, 1], true)).toThrow(
+        Error,
+      );
 
-      expect(() =>
-        placeShip(gameBoardWithShip, destroyer, [0, 0], !isHorizontal),
-      ).toThrow(Error);
+      expect(() => placeShip(boardWithShip, destroyer, [0, 0], false)).toThrow(
+        Error,
+      );
     });
 
     test("prevents placing the same ship twice", () => {
-      expect(() =>
-        placeShip(gameBoardWithShip, destroyer, [5, 5], isHorizontal),
-      ).toThrow(Error);
+      expect(() => placeShip(boardWithShip, destroyer, [5, 5], true)).toThrow(
+        Error,
+      );
     });
   });
 
   describe("valid ship placement", () => {
+    // TEMP: testing through internals until public API is complete
     test("places ship at top left corner", () => {
-      expect(getShipIDAt(gameBoardWithShip, [0, 0])).toBe("destroyer");
-      expect(getShipIDAt(gameBoardWithShip, [0, 1])).toBe("destroyer");
+      // test initial state
+      expect(emptyBoard.board[0][0].shipID).toBeNull();
+      expect(emptyBoard.board[0][1].shipID).toBeNull();
 
-      expect(getShipIDAt(gameBoardWithShip, [1, 0])).toBeNull();
-      expect(getShipIDAt(gameBoardWithShip, [0, 2])).toBeNull();
+      // place ship at top left corner
+      const board = placeShip(emptyBoard, destroyer, [0, 0], true);
+
+      // confirm that ship is held at top left corner
+      expect(board.board[0][0].shipID).toBe("destroyer");
+      expect(board.board[0][1].shipID).toBe("destroyer");
     });
 
+    // TEMP: testing through internals until public API is complete
     test("places ship at bottom right corner", () => {
-      // occupies [9,8] [9,9]
-      gameBoardWithShip = placeShip(gameBoard, destroyer, [9, 8], isHorizontal);
+      // test initial state
+      expect(emptyBoard.board[9][8].shipID).toBeNull();
+      expect(emptyBoard.board[9][9].shipID).toBeNull();
 
-      expect(getShipIDAt(gameBoardWithShip, [9, 8])).toBe("destroyer");
-      expect(getShipIDAt(gameBoardWithShip, [9, 9])).toBe("destroyer");
+      // place ship at top left corner
+      const board = placeShip(emptyBoard, destroyer, [9, 8], true);
 
-      expect(getShipIDAt(gameBoardWithShip, [9, 7])).toBeNull();
-      expect(getShipIDAt(gameBoardWithShip, [8, 9])).toBeNull();
+      // confirm that ship is held at top left corner
+      expect(board.board[9][8].shipID).toBe("destroyer");
+      expect(board.board[9][9].shipID).toBe("destroyer");
     });
   });
 
   describe("ship tracking", () => {
-    test("places the correct ship ID in covered cells", () => {
-      expect(getShipIDAt(gameBoardWithShip, [0, 0])).toBe("destroyer");
-      expect(getShipIDAt(gameBoardWithShip, [0, 1])).toBe("destroyer");
-    });
-
-    test("different ships have different IDs in cells", () => {
-      const gameBoardWithTwoShips = placeShip(
-        gameBoardWithShip,
-        createShip("carrier", 5),
-        [1, 0], // just below first ship
-        isHorizontal,
+    // TEMP: testing through internals until public API is complete
+    test("track multiple ships independently", () => {
+      const board1 = placeShip(
+        emptyBoard,
+        createShip("ship1", 2),
+        [0, 0],
+        true,
       );
+      const board2 = placeShip(board1, createShip("ship2", 2), [1, 0], true);
 
-      expect(getShipIDAt(gameBoardWithShip, [0, 0])).toBe("destroyer");
-      expect(getShipIDAt(gameBoardWithShip, [0, 1])).toBe("destroyer");
+      const ship1ID = board2.board[0][0].shipID;
+      const ship2ID = board2.board[1][0].shipID;
 
-      expect(getShipIDAt(gameBoardWithTwoShips, [1, 0])).toBe("carrier");
-      expect(getShipIDAt(gameBoardWithTwoShips, [1, 1])).toBe("carrier");
+      expect(ship1ID).toBe("ship1");
+      expect(ship2ID).toBe("ship2");
     });
+  });
+});
+
+/**
+ * Attacks a position on the game board, and records the coordinates of the attack.
+ * If the attack hits a ship, it increments the hit count of that ship.
+ * @param {GameBoard} gameBoard game board to be attacked
+ * @param {Position} pos - the position on the game board to attack
+ * @returns {GameBoard} game board with a new attack
+ * @throws {TypeError} if position type is invalid
+ * @throws {RangeError} if position is outside of the game board
+ * @throws {Error} if position has already been attacked
+ */
+// function receiveAttack(pos) {}
+describe("receiveAttack", () => {
+  describe("input validation", () => {
+    test("handles invalid game board", () => {
+      expect(() => receiveAttack(null, [0, 0])).toThrow(TypeError);
+    });
+    test("handles invalid position type", () => {
+      expect(() => receiveAttack(emptyBoard, null)).toThrow(TypeError);
+    });
+    test("handles invalid position range", () => {
+      expect(() => receiveAttack(emptyBoard, [10, 9])).toThrow(RangeError);
+      expect(() => receiveAttack(emptyBoard, [-1, 0])).toThrow(RangeError);
+    });
+    test("handles duplicate attack", () => {
+      const attackedBoard = receiveAttack(emptyBoard, [0, 0]);
+      expect(() => receiveAttack(attackedBoard, [0, 0])).toThrow(Error);
+    });
+  });
+
+  describe("hit/miss tracking", () => {
+    // TEMP: testing through internals until public API is complete
+    test("records attack on empty cell as miss", () => {
+      // test initial board state
+      expect(getMisses(emptyBoard)).not.toContainEqual([0, 0]);
+
+      // receive attack
+      const board = receiveAttack(emptyBoard, [0, 0]);
+
+      // test final board state
+      expect(getMisses(board)).toContainEqual([0, 0]);
+    });
+
+    // TEMP: testing through internals until public API is complete
+    test("records attack on ship cell as hit", () => {
+      // test initial board state
+      const board1 = placeShip(emptyBoard, destroyer, [0, 0], true);
+      expect(getHits(board1)).not.toContainEqual([0, 0]);
+
+      // receive attack
+      const board2 = receiveAttack(board1, [0, 0]);
+
+      // test final board state
+      expect(getHits(board2)).toContainEqual([0, 0]);
+    });
+
+    // TEMP: testing through internals until public API is complete
+    test("accumulates multiple attacks", () => {
+      expect(getMisses(emptyBoard)).toHaveLength(0);
+
+      const board1 = receiveAttack(emptyBoard, [0, 0]);
+      const board2 = receiveAttack(board1, [1, 1]);
+
+      expect(getMisses(board2)).toHaveLength(2);
+    });
+  });
+  describe("ship damage", () => {
+    // TEMP: testing through internals until public API is complete
+    test("increments hit count on correct ship", () => {
+      const board1 = placeShip(emptyBoard, destroyer, [0, 0], true);
+      expect(board1.ships.get("destroyer").hits).toBe(0);
+
+      const board2 = receiveAttack(board1, [0, 0]);
+      expect(board2.ships.get("destroyer").hits).toBe(1);
+    });
+
+    test("does not increment hit count on miss", () => {
+      const board1 = placeShip(emptyBoard, destroyer, [0, 0], true);
+      expect(board1.ships.get("destroyer").hits).toBe(0);
+
+      const board2 = receiveAttack(board1, [5, 5]);
+      expect(board2.ships.get("destroyer").hits).toBe(0);
+    });
+
+    // TEMP: testing through internals until public API is complete
+    test("damages correct ship when multiple ships on board", () => {
+      const board1 = placeShip(emptyBoard, destroyer, [0, 0], true);
+      const board2 = placeShip(board1, createShip("carrier", 5), [1, 0], true);
+      expect(board2.ships.get("destroyer").hits).toBe(0);
+      expect(board2.ships.get("carrier").hits).toBe(0);
+
+      const board3 = receiveAttack(board2, [0, 0]);
+
+      expect(board3.ships.get("destroyer").hits).toBe(1);
+      expect(board3.ships.get("carrier").hits).toBe(0);
+    });
+  });
+});
+
+describe("getMisses", () => {
+  test("handles invalid game board", () => {
+    expect(() => getMisses(null)).toThrow(TypeError);
+  });
+
+  test("returns an empty array for board with no attacks", () => {
+    expect(getMisses(emptyBoard)).toHaveLength(0);
+  });
+  test("records multiple misses", () => {
+    const board1 = receiveAttack(emptyBoard, [0, 0]);
+    const board2 = receiveAttack(board1, [1, 1]);
+
+    expect(getMisses(board2)).toEqual([
+      [0, 0],
+      [1, 1],
+    ]);
+  });
+  test("excludes hits from results", () => {
+    const board1 = placeShip(emptyBoard, destroyer, [0, 0], true);
+    const board2 = receiveAttack(board1, [0, 0]);
+    const board3 = receiveAttack(board2, [0, 1]);
+    const board4 = receiveAttack(board3, [1, 1]);
+
+    expect(getMisses(board4)).toHaveLength(1);
+  });
+});
+
+describe("getHits", () => {
+  test("handles invalid game board", () => {
+    expect(() => getHits(null)).toThrow(TypeError);
+  });
+
+  test("returns an empty array for board with no attacks", () => {
+    expect(getHits(emptyBoard)).toHaveLength(0);
+  });
+
+  test("records multiple hits", () => {
+    const board1 = placeShip(emptyBoard, destroyer, [0, 0], true);
+    const board2 = receiveAttack(board1, [0, 0]);
+    const board3 = receiveAttack(board2, [0, 1]);
+
+    expect(getHits(board3)).toEqual([
+      [0, 0],
+      [0, 1],
+    ]);
+  });
+
+  test("excludes misses from results", () => {
+    const board1 = placeShip(emptyBoard, destroyer, [0, 0], true);
+    const board2 = receiveAttack(board1, [1, 1]);
+    const board3 = receiveAttack(board2, [2, 2]);
+    const board4 = receiveAttack(board3, [0, 0]);
+
+    expect(getHits(board4)).toHaveLength(1);
   });
 });
