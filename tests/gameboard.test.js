@@ -5,6 +5,7 @@ import {
   receiveAttack,
   getHits,
   getMisses,
+  areAllShipsSunk,
 } from "../src/models/gameBoard.js";
 
 let emptyBoard;
@@ -272,5 +273,30 @@ describe("getHits", () => {
     const board4 = receiveAttack(board3, [0, 0]);
 
     expect(getHits(board4)).toHaveLength(1);
+  });
+});
+
+describe("areAllShipsSunk", () => {
+  test("handles invalid inputs", () => {
+    expect(() => areAllShipsSunk(null)).toThrow(TypeError);
+  });
+
+  test("returns true for an empty board", () => {
+    expect(areAllShipsSunk(emptyBoard)).toBe(true);
+  });
+
+  test("returns true only when all ships are sunk", () => {
+    const ship1 = createShip("ship1", 2);
+    const ship2 = createShip("ship2", 2);
+    const board1 = placeShip(emptyBoard, ship1, [0, 0], true);
+    const board2 = placeShip(board1, ship2, [1, 0], true);
+
+    const board3 = receiveAttack(board2, [0, 0]);
+    const board4 = receiveAttack(board3, [0, 1]);
+    const board5 = receiveAttack(board4, [1, 0]);
+    expect(areAllShipsSunk(board5)).toBe(false);
+
+    const board6 = receiveAttack(board5, [1, 1]);
+    expect(areAllShipsSunk(board6)).toBe(true);
   });
 });

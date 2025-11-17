@@ -1,5 +1,5 @@
 import { freeze } from "../utils/functional.js";
-import { validateShip, hit } from "./ship.js";
+import { validateShip, hit, isSunk } from "./ship.js";
 
 /**
  * Represents a battleship game board. Game boards can place ships at specific coordinates,
@@ -128,6 +128,20 @@ export function receiveAttack(gameBoard, pos) {
   }
 
   return gameBoardCopy;
+}
+
+/**
+ * Checks whether all ships are sunk on a game board
+ * @param {GameBoard} gameBoard - the game board to check
+ * @returns {boolean} true if all ships are sunk, false otherwise
+ * @throws {TypeError} if gameBoard is invalid
+ */
+export function areAllShipsSunk(gameBoard) {
+  validateGameBoard(gameBoard);
+  for (const ship of gameBoard.ships.values()) {
+    if (!isSunk(ship)) return false;
+  }
+  return true;
 }
 
 /**
