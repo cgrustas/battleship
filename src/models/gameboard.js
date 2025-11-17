@@ -220,19 +220,6 @@ function validateGameBoard(gameBoard) {
 }
 
 /**
- * Checks whether a ship covers the position on the board
- * @param {GameBoard} gameBoard - the game board
- * @param {Position} pos - the position on the game board
- * @returns {string|null} true if ship occupies the position, false otherwise
- * @throws {RangeError} if position is outside of the board
- */
-export function getShipIDAt(gameBoard, pos) {
-  validatePosition(pos);
-  const [row, col] = pos;
-  return gameBoard.board[row][col].shipID;
-}
-
-/**
  * Checks if a position is outside of the game board
  * @param pos - position to check
  * @returns {void}
