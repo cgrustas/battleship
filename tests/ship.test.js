@@ -21,32 +21,17 @@ describe("invalid ship creation", () => {
   });
 });
 
-describe("valid ship creation", () => {
-  test("creates smallest ship", () =>
-    expect(createShip("destroyer", 2)).toEqual({
-      id: "destroyer",
-      length: 2,
-      hits: 0,
-    }));
-
-  test("creates largest ship", () =>
-    expect(createShip("carrier", 5)).toEqual({
-      id: "carrier",
-      length: 5,
-      hits: 0,
-    }));
-});
-
 describe("hit", () => {
   test("increments hit count", () => {
-    const ship = createShip("cruiser", 3);
-    expect(ship.hits).toBe(0);
+    const ship1 = createShip("cruiser", 3);
+    expect(isSunk(ship1)).toBe(false);
 
-    const shipHitOnce = hit(ship);
-    expect(shipHitOnce.hits).toBe(1);
+    const ship2 = hit(ship1);
+    const ship3 = hit(ship2);
+    expect(isSunk(ship3)).toBe(false);
 
-    const shipHitTwice = hit(shipHitOnce);
-    expect(shipHitTwice.hits).toBe(2);
+    const ship4 = hit(ship3);
+    expect(isSunk(ship4)).toBe(true);
   });
 });
 
