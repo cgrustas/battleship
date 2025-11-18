@@ -16,7 +16,6 @@ import { renderGameState } from "../views/renderer";
  */
 export function startTemplateGame() {
   const templateGame = createTemplateGame();
-  console.log(templateGame);
   const displayData = createDisplayData(templateGame);
   renderGameState(displayData);
 }
