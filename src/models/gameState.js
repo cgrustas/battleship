@@ -7,12 +7,14 @@ import { createPlayer } from "./player";
  * @typedef {Object} GameState
  * @property {Player} user - the human user playing the game
  * @property {Player} computer - the computer the human is facing
+ * @property {boolean} isUserTurn - true if user is the active player, false otherwise
  */
 
 /**
  * TEMP: Will implement a system for allowing players to place their ships later
  * Creates a game with each player holding a game board with 5 ships,
  * all laid horizontally in the top five rows of the game board.
+ * The user takes the first turn.
  * @returns {Player} players with template game boards
  */
 export function createTemplateGame() {
@@ -35,5 +37,18 @@ export function createTemplateGame() {
   return {
     user,
     computer,
+    isUserTurn: true,
+  };
+}
+
+/**
+ * Switches the player's turn.
+ * @param {GameState} gameState
+ * @returns {GameState} new game with toggled active player
+ */
+export function switchTurn(gameState) {
+  return {
+    ...gameState,
+    isUserTurn: !gameState.isUserTurn,
   };
 }
