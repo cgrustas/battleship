@@ -1,4 +1,4 @@
-import { createShip } from "../src/models/ship";
+import { createShip } from "../src/models/ship.js";
 import {
   createGameBoard,
   placeShip,
@@ -6,6 +6,7 @@ import {
   getHits,
   getMisses,
   areAllShipsSunk,
+  getBoardStates,
 } from "../src/models/gameBoard.js";
 
 let emptyBoard;
@@ -299,5 +300,41 @@ describe("areAllShipsSunk", () => {
 
     const board6 = receiveAttack(board5, [1, 1]);
     expect(areAllShipsSunk(board6)).toBe(true);
+  });
+});
+
+describe("getBoardStates", () => {
+  test("handles invalid inputs", () => {
+    expect(() => getBoardStates(null)).toThrow(TypeError);
+  });
+
+  test("returns 10x10 grid of empty cell states for empty board", () => {
+    const boardStates = getBoardStates(emptyBoard);
+    expect(boardStates).toHaveLength(10);
+    boardStates.forEach((row) => {
+      expect(row).toHaveLength(10);
+      row.forEach((cell) => {
+        expect(cell).toBe("empty");
+      });
+    });
+  });
+
+  test("records ship cell state", () => {
+    const board1 = placeShip(emptyBoard, destroyer, [0, 0], true);
+    const boardStates = getBoardStates(board1);
+    expect(boardStates[0][0]).toBe("ship");
+  });
+
+  test("records hit cell state", () => {
+    const board1 = placeShip(emptyBoard, destroyer, [0, 0], true);
+    const board2 = receiveAttack(board1, [0, 0]);
+    const boardStates = getBoardStates(board2);
+    expect(boardStates[0][0]).toBe("hit");
+  });
+
+  test("records miss cell state", () => {
+    const board1 = receiveAttack(emptyBoard, [0, 0]);
+    const boardStates = getBoardStates(board1);
+    expect(boardStates[0][0]).toBe("miss");
   });
 });

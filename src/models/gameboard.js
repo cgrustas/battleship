@@ -150,6 +150,7 @@ export function areAllShipsSunk(gameBoard) {
  * @param {GameBoard} gameBoard - the board to retrieve misses from
  */
 export function getMisses(gameBoard) {
+  validateGameBoard(gameBoard);
   const misses = [];
   for (let i = 0; i < 10; i++) {
     for (let j = 0; j < 10; j++) {
@@ -168,6 +169,7 @@ export function getMisses(gameBoard) {
  * @param {GameBoard} gameBoard - the board to retrieve hits from
  */
 export function getHits(gameBoard) {
+  validateGameBoard(gameBoard);
   const hits = [];
   for (let i = 0; i < 10; i++) {
     for (let j = 0; j < 10; j++) {
@@ -185,6 +187,7 @@ export function getHits(gameBoard) {
  * @param {Cell} cell - the cell to check
  * @returns {boolean} true if cell has been attacked and missed, false otherwise
  */
+
 function isMiss(cell) {
   return cell.isAttacked && cell.shipID === null;
 }
@@ -249,4 +252,41 @@ function validatePosition(pos) {
   const [row, col] = pos;
   if (row < 0 || row > 9 || col < 0 || col > 9)
     throw new RangeError("Position is outside of the game board");
+}
+
+/**
+ * Checks if a cell is occupied by a ship
+ * @param {Cell} cell - cell to check
+ */
+function hasShipAt(cell) {
+  return cell.shipID !== null;
+}
+
+/**
+ * Gets the display state of each cell on the board. Transforms internal board
+ * representation into a 10x10 grid of display states for UI rendering.
+ * @param {GameBoard} gameBoard - the game board to get display states from
+ * @returns {string[][]} 10x10 grid where each cell is "empty", "ship", "hit", or "miss"
+ * @throws {TypeError} if gameBoard is invalid
+ */
+export function getBoardStates(gameBoard) {
+  validateGameBoard(gameBoard);
+
+  const cellStates = [];
+  gameBoard.board.forEach((row) => {
+    const rowOfStates = [];
+    row.forEach((cell) => {
+      let value;
+      if (isMiss(cell)) value = "miss";
+      else if (isHit(cell)) value = "hit";
+      else if (hasShipAt(cell)) value = "ship";
+      else value = "empty";
+
+      rowOfStates.push(value);
+    });
+
+    cellStates.push(rowOfStates);
+  });
+
+  return cellStates;
 }
