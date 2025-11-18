@@ -1,0 +1,33 @@
+.battlefields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.user,
+.computer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.battlefield-grid {
+  background-color: black;
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  grid-gap: 1px;
+  border: 1px solid black;
+}
+
+.battlefield-row {
+  display: contents;
+}
+
+.battlefield-cell {
+  background-color: white;
+  width: 2rem;
+  height: 2rem;
+}
+
+.battlefield-cell.ship {
+  background-color: lightblue;
+}
