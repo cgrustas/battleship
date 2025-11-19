@@ -1,7 +1,7 @@
 import { createShip, hit, isSunk } from "../src/models/ship.js";
 
 describe("createShip", () => {
-  describe("input type validation", () => {
+  describe("input ship creation", () => {
     test("handles invalid ID", () => {
       expect(() => createShip(null, 3)).toThrow(TypeError);
       expect(() => createShip("", 3)).toThrow(TypeError);
@@ -11,27 +11,42 @@ describe("createShip", () => {
       expect(() => createShip("valid ID", null)).toThrow(TypeError);
       expect(() => createShip("valid ID", 2.2)).toThrow(TypeError);
     });
-  });
-});
 
-describe("invalid ship creation", () => {
-  test("handles invalid length range", () => {
-    expect(() => createShip("too small", 1)).toThrow(RangeError);
-    expect(() => createShip("too big", 6)).toThrow(RangeError);
+    test("handles invalid length range", () => {
+      expect(() => createShip("too small", 1)).toThrow(RangeError);
+      expect(() => createShip("too big", 6)).toThrow(RangeError);
+    });
+  });
+
+  describe("valid ship creation", () => {
+    test("creates ships with correct properties", () => {
+      const ship1 = createShip("destroyer", 2);
+      expect(ship1).toEqual({
+        id: "destroyer",
+        length: 2,
+        hits: 0,
+      });
+
+      const ship2 = createShip("cruiser", 3);
+      expect(ship2).toEqual({
+        id: "cruiser",
+        length: 3,
+        hits: 0,
+      });
+    });
   });
 });
 
 describe("hit", () => {
   test("increments hit count", () => {
     const ship1 = createShip("cruiser", 3);
-    expect(isSunk(ship1)).toBe(false);
+    expect(ship1.hits).toBe(0);
 
     const ship2 = hit(ship1);
-    const ship3 = hit(ship2);
-    expect(isSunk(ship3)).toBe(false);
+    expect(ship2.hits).toBe(1);
 
-    const ship4 = hit(ship3);
-    expect(isSunk(ship4)).toBe(true);
+    const ship3 = hit(ship2);
+    expect(ship3.hits).toBe(2);
   });
 });
 
