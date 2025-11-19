@@ -1,74 +1,43 @@
-# Odin Template
+# Battleship
 
-A modern JavaScript project template for [The Odin Project](https://www.theodinproject.com/) curriculum.
+An implementation of the classic Battleship game, built as part of [The Odin Project](https://www.theodinproject.com/) curriculum.
 
-## Features
+## Overview
 
-- **Webpack** - with separate dev/prod configurations
-- **Asset Management** - Image and font loading configured for Webpack
-- **ESLint** - with flat config
-- **Prettier** - with pre-commit hooks (Husky & lint-staged)
-- **Jest** - with Babel support
-- **CSS Reset**
+This project implements a browser-based version of Battleship where players battle against a computer opponent. Before the game begins, the user can shuffle their ship positions by clicking the 'randomize' button. For attacks, users can click on a grid cell in the enemy game board. There is visual feedback for hits, misses, and the ship locations for the enemy's board are obscured. Once a player's ships have all been sunk, a modal appears with the option to play again.
 
-## Getting Started
+Each board contains the Milton Bradley fleet composition:
 
-1. Click "Use this template" on GitHub or clone the repository
-2. Update project metadata:
-   - Change `name` and `description` in `package.json`
-   - Update `<title>` in `src/template.html`
-   - Update repository URL in `package.json`
-3. Install dependencies:
-   ```bash
-   npm install
-   ```
-4. Start development server:
-   ```bash
-   npm start
-   ```
+- Carrier (5 cells)
+- Battleship (4 cells)
+- Cruiser (3 cells)
+- Submarine (3 cells)
+- Destroyer (2 cells)
 
-## Project Structure
+## Skills Demonstrated
 
-```
-├── src/
-│   ├── styles/
-│   │   ├── reset.css      # CSS reset for consistency
-│   │   └── styles.css     # Your styles here
-│   ├── index.js           # Application entry point
-│   └── template.html      # HTML template
-├── tests/                 # Jest test files
-├── dist/                  # Built files (git-ignored)
-├── webpack.common.js      # Shared webpack config
-├── webpack.dev.js         # Development config
-├── webpack.prod.js        # Production config
-└── eslint.config.mjs      # ESLint flat config
-```
+### Functional Programming
 
-## Available Scripts
+- **Pure functions** as atomic units of composition. This was a vast departure from my previous projects.
+- **Immutable data structures** using `Object.freeze()` to prevent mutation, but more so treating objects as immutable
+- **Composition over inheritance** avoiding class hierarchies in favor of function composition (was especially helpful with the user/computer player functionality)
 
-- `npm start` - Start development server with live reload
-- `npm run build` - Build for production to `dist/` folder
-- `npm test` - Run Jest tests
-- `npm run deploy` - Build and deploy to GitHub Pages (requires gh-pages package)
+### Test-Driven Development (TDD)
 
-## GitHub Pages Deployment
+- **Comprehensive test coverage** for all public APIs
+- **Knowing what to test** tested incoming queries by making assertions about what they return
+- **Knowing what not to test** private methods, outgoing queries, implementation details, exhaustive type checking, DOM manipulation, and imperative controller orchestration (covered by integration tests)
+- **Black-box testing** focusing on behavior rather than implementation
+- **Input validation** for edge cases and error conditions
 
-### First Deployment
+### Software Architecture
 
-When you're ready to deploy your project:
+- **Model-View-Controller (MVC) pattern**
+- **Module organization** with one responsibility per module. I elected to not create objects for single instances (controller, view)
+- **Minimal coupling** between components for better testability
+- **Defensive programming** with thorough input validation
 
-1. Push your repository to GitHub if you haven't already
-2. Run `npm run deploy` - this creates the gh-pages branch and deploys
-3. Go to Settings → Pages in your GitHub repo
-4. Set source to "Deploy from a branch" and select "gh-pages"
-5. Your site will be live at `https://[username].github.io/[repo-name]/`
+### Code Quality
 
-### Updating Your Site
-
-After initial setup, deploy updates anytime with:
-
-```bash
-npm run deploy
-```
-
-This automatically builds and deploys your project. The predeploy script runs `npm run build` before deploying.
+- **Conventional commits** following semantic versioning standards
+- **Clear error handling** with appropriate error types (TypeError, RangeError)
