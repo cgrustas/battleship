@@ -6,6 +6,7 @@ import {
   receiveAttack,
   areAllShipsSunk,
   getBoardStates,
+  hasReceivedAttacks,
 } from "../src/models/gameBoard.js";
 
 let emptyBoard;
@@ -262,5 +263,18 @@ describe("getBoardStates", () => {
     const board1 = receiveAttack(emptyBoard, [0, 0]);
     const boardStates = getBoardStates(board1);
     expect(boardStates[0][0]).toBe("miss");
+  });
+});
+
+describe("hasReceivedAttacks", () => {
+  test("new board has not received attacks", () => {
+    expect(hasReceivedAttacks(createEmptyGameBoard())).toBe(false);
+  });
+
+  test("returns true when board has been attacked", () => {
+    const board1 = createEmptyGameBoard();
+    expect(hasReceivedAttacks(board1)).toBe(false);
+    const board2 = receiveAttack(board1, [0, 0]);
+    expect(hasReceivedAttacks(board2)).toBe(true);
   });
 });

@@ -13,6 +13,18 @@
  */
 
 /**
+ * Callback invoked when the "Play Again" button is clicked to start a new game.
+ * @callback PlayAgainClickHandler
+ * @returns {void}
+ */
+
+/**
+ * Callback invoked when the "Randomize" button is clicked
+ * @callback RandomizeButtonClickHandler
+ * @returns {void}
+ */
+
+/**
  * Displays a game of battleship on the page.
  * @param {DisplayData} displayData - the game state to display
  * @returns {void}
@@ -20,11 +32,28 @@
 export function displayGame(displayData) {
   const body = document.querySelector("body");
   body.innerHTML = "";
+
+  const title = document.createElement("h1");
+  title.textContent = "Battleship";
+  body.appendChild(title);
+
+  if (displayData.isGameOver) {
+    const dialog = createGameOverMessage(displayData.winner);
+    body.appendChild(dialog);
+    dialog.showModal();
+  }
+
   const battlefields = createBattlefields(
     displayData.userBoardStates,
     displayData.computerBoardStates,
   );
   body.appendChild(battlefields);
+
+  if (displayData.canRandomize) {
+    const userBattlefield = document.querySelector(".user");
+    const randomizeButton = createRandomizeButton();
+    userBattlefield.appendChild(randomizeButton);
+  }
 }
 
 /**
@@ -84,7 +113,7 @@ function createComputerBattlefield(computerBoardStates) {
 /**
  * Creates a grid element displaying the state of a game board.
  * Generates a 10x10 grid of cell elements, each styled according to its state.
- * @param {GameBoard} boardStates - the game board states to display
+ * @param {CellState[][]} boardStates - the game board states to display
  * @returns {HTMLDivElement} battlefield grid element containing all cells
  */
 function createBattlefieldGrid(boardStates) {
@@ -134,4 +163,67 @@ function createBattlefieldLabel(text) {
   label.classList.add("battlefield-label");
   label.textContent = text;
   return label;
+}
+
+/**
+ * Creates a game over message
+ * @param {"user"|"computer"} winner - the winner of the game
+ * @returns {HTMLDialogElement} - game over message
+ */
+function createGameOverMessage(winner) {
+  const dialog = document.createElement("dialog");
+  dialog.classList.add("game-over-dialog");
+
+  const message = document.createElement("p");
+  if (winner === "user") {
+    dialog.classList.add("user-win");
+    message.textContent = "You win!";
+  } else {
+    dialog.classList.add("user-loss");
+    message.textContent = "You lose.";
+  }
+
+  const playAgainButton = document.createElement("button");
+  playAgainButton.textContent = "Play Again";
+  playAgainButton.classList.add("play-again-button");
+
+  dialog.appendChild(message);
+  dialog.appendChild(playAgainButton);
+  return dialog;
+}
+
+/**
+ * Registers a callback when the play again button is clicked
+ * @param {PlayAgainClickHandler} callback - function to call when button is clicked
+ * @returns {void}
+ */
+export function onPlayAgainButtonClick(callback) {
+  const button = document.querySelector(".play-again-button");
+  if (button) {
+    button.addEventListener("click", callback);
+  }
+}
+
+/**
+ * Creates a randomize button to randomize the user's board
+ * @returns {HTMLButtonElement} randomize button
+ */
+function createRandomizeButton() {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.classList.add("randomize-button");
+  button.textContent = "Randomize";
+  return button;
+}
+
+/**
+ * Registers a callback when the randomize button is clicked
+ * @param {RandomizeButtonClickHandler} callback - function to call when the randomize button is clicked
+ * @returns {void}
+ */
+export function onRandomizeButtonClick(callback) {
+  const button = document.querySelector(".randomize-button");
+  if (button) {
+    button.addEventListener("click", callback);
+  }
 }

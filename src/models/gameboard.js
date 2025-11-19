@@ -53,8 +53,6 @@ export function createRandomGameBoard(ships) {
   return board;
 }
 
-export function cycleGameBoard() {}
-
 /**
  * Creates an empty game board for a player.
  * @returns {GameBoard} game board full of empty cells
@@ -283,4 +281,13 @@ export function getBoardStates(gameBoard) {
   });
 
   return cellStates;
+}
+
+/**
+ * Checks if a game board ahs received attacks
+ * @param {GameBoard} gameBoard - the game board to check
+ * @returns
+ */
+export function hasReceivedAttacks(gameBoard) {
+  return gameBoard.board.some((row) => row.some((cell) => cell.isAttacked));
 }

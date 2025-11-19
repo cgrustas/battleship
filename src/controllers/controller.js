@@ -3,19 +3,36 @@ import {
   processUserAttack,
   processComputerAttack,
   isGameOver,
+  randomizeUserBoard,
 } from "../models/gameState";
-import { getBoardStates } from "../models/gameBoard.js";
-import { displayGame, onComputerCellClick } from "../views/renderer";
+import {
+  getBoardStates,
+  areAllShipsSunk,
+  hasReceivedAttacks,
+} from "../models/gameBoard.js";
+import {
+  displayGame,
+  onComputerCellClick,
+  onPlayAgainButtonClick,
+  onRandomizeButtonClick,
+} from "../views/renderer";
 
 /**
  * Represents the game state translated as display data for the view.
  * @typedef {Object} DisplayData
  * @property {CellState[][]} userBoardStates - a 10x10 grid of cell states from the user
  * @property {CellState[][]} computerBoardStates - a 10x10 grid of cell states from the computer
+ * @property {boolean} isGameOver - true if the game is over, false otherwise
+ * @property {"user"|"computer"|null} winner - "user" if user won, "computer" if computer won, null if game is not over
+ * @property {boolean} canRandomize - true if the user can randomize the game board, false otherwise
  */
 
 let gameState;
 
+/**
+ * Starts a new game of battleship
+ * @returns {void}
+ */
 export function startGame() {
   gameState = createGame();
   updateScreen();
@@ -37,11 +54,20 @@ function updateScreen() {
  * @returns {DisplayData} display data
  */
 function createDisplayData() {
+  const userWon = areAllShipsSunk(gameState.computerGameBoard);
+  const computerWon = areAllShipsSunk(gameState.userGameBoard);
+  const canRandomize =
+    !hasReceivedAttacks(gameState.computerGameBoard) &&
+    !hasReceivedAttacks(gameState.userGameBoard);
+
   return {
     userBoardStates: getBoardStates(gameState.userGameBoard),
     computerBoardStates: maskOpponentShips(
       getBoardStates(gameState.computerGameBoard),
     ),
+    isGameOver: userWon || computerWon,
+    winner: userWon ? "user" : computerWon ? "computer" : null,
+    canRandomize,
   };
 }
 
@@ -64,6 +90,8 @@ function maskOpponentShips(boardStates) {
  */
 function setUpGameHandlers() {
   onComputerCellClick(handleUserAttack);
+  onPlayAgainButtonClick(startGame);
+  onRandomizeButtonClick(handleUserBoardRandomization);
 }
 
 /**
@@ -92,4 +120,13 @@ function handleUserAttack(row, col) {
 
     throw error;
   }
+}
+
+/**
+ * Randomizes the user's board
+ * @returns {void}
+ */
+function handleUserBoardRandomization() {
+  gameState = randomizeUserBoard(gameState);
+  updateScreen();
 }

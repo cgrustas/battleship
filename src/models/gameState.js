@@ -86,3 +86,15 @@ export function isGameOver(gameState) {
     areAllShipsSunk(gameState.computerGameBoard)
   );
 }
+
+/**
+ * Randomizes the user's board
+ * @param {GameState} gameState - the current game state
+ * @returns {GameState} game with a new random user board
+ */
+export function randomizeUserBoard(gameState) {
+  return {
+    ...gameState,
+    userGameBoard: createRandomGameBoard(createStandardFleet()),
+  };
+}

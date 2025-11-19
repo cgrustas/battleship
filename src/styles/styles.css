@@ -1,3 +1,17 @@
+body {
+  height: 100vh;
+  display: grid;
+  grid-template-rows: min-content 1fr;
+  padding: 1rem;
+  row-gap: 3rem;
+}
+
+h1 {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 800;
+}
+
 .battlefields {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -8,6 +22,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 1rem;
 }
 
 .battlefield-grid {
@@ -38,4 +53,67 @@
 
 .battlefield-cell.miss {
   background-color: lightcoral;
+}
+
+.battlefield-label {
+  font-weight: 500;
+}
+
+.game-over-dialog::backdrop {
+  background-color: rgba(0, 0, 0, 0.5); /* 50% opacity black overlay */
+}
+
+.game-over-dialog {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+
+  height: fit-content;
+  width: 40%;
+  padding: 2rem;
+  border-radius: 8px;
+  border: none;
+  color: white;
+}
+
+.game-over-dialog.user-win {
+  background-color: #006100;
+}
+
+.game-over-dialog.user-loss {
+  background-color: #9c0006;
+}
+
+.game-over-dialog p {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.play-again-button {
+  background-color: inherit;
+  color: white;
+  appearance: none;
+  border-radius: 4px;
+  border: 1px solid white;
+}
+
+.play-again-button:hover,
+.randomize-button:hover {
+  font-weight: 600;
+}
+
+.play-again-button:focus-visible {
+  outline: none;
+}
+
+.randomize-button {
+  background-color: inherit;
+  border: 1px solid black;
+  border-radius: 4px;
 }
