@@ -1,54 +1,88 @@
-import { createGameBoard, placeShip } from "./gameBoard";
+import {
+  areAllShipsSunk,
+  createRandomGameBoard,
+  receiveAttack,
+  getBoardStates,
+} from "./gameBoard";
 import { createShip } from "./ship";
-import { createPlayer } from "./player";
 
 /**
  * Represents the current state of the battleship game.
  * @typedef {Object} GameState
- * @property {Player} user - the human user playing the game
- * @property {Player} computer - the computer the human is facing
- * @property {boolean} isUserTurn - true if user is the active player, false otherwise
+ * @property {GameBoard} userGameBoard - the human's game board
+ * @property {GameBoard} computerGameBoard - the computer's game board
+ * @property {boolean} isUserTurn
  */
 
 /**
- * TEMP: Will implement a system for allowing players to place their ships later
- * Creates a game with each player holding a game board with 5 ships,
- * all laid horizontally in the top five rows of the game board.
- * The user takes the first turn.
- * @returns {Player} players with template game boards
+ * Creates a new battleship game.
+ * @returns {GameState} empty battleship game
  */
-export function createTemplateGame() {
-  const carrier = createShip("carrier", 5);
-  const battleship = createShip("battleship", 4);
-  const cruiser = createShip("cruiser", 3);
-  const submarine = createShip("submarine", 3);
-  const destroyer = createShip("destroyer", 2);
-
-  const emptyBoard = createGameBoard();
-  const board1 = placeShip(emptyBoard, carrier, [0, 0], true);
-  const board2 = placeShip(board1, battleship, [1, 0], true);
-  const board3 = placeShip(board2, cruiser, [2, 0], true);
-  const board4 = placeShip(board3, submarine, [3, 0], true);
-  const templateBoard = placeShip(board4, destroyer, [4, 0], true);
-
-  const user = createPlayer(templateBoard);
-  const computer = createPlayer(structuredClone(templateBoard));
-
+export function createGame() {
   return {
-    user,
-    computer,
+    userGameBoard: createRandomGameBoard(createStandardFleet()),
+    computerGameBoard: createRandomGameBoard(createStandardFleet()),
     isUserTurn: true,
   };
 }
 
 /**
- * Switches the player's turn.
- * @param {GameState} gameState
- * @returns {GameState} new game with toggled active player
+ * Creates a fleet of ships to be placed on each game board.
+ * Uses Milton Bradley's version of the rules to specify the fleet.
+ * @returns {Ship[]} fleet of ships
  */
-export function switchTurn(gameState) {
+function createStandardFleet() {
+  return [
+    createShip("carrier", 5),
+    createShip("battleship", 4),
+    createShip("cruiser", 3),
+    createShip("submarine", 3),
+    createShip("destroyer", 2),
+  ];
+}
+
+/**
+ * Attacks the cell at the given position on the computer's board
+ * @param {GameState} gameState - the current state of the game
+ * @param {number} row - the row on the board where the cell was attacked
+ * @param {number} col - the column on the board where the cell was attacked
+ * @returns {GameState} game state after attack has been processed
+ */
+export function processUserAttack(gameState, row, col) {
   return {
     ...gameState,
-    isUserTurn: !gameState.isUserTurn,
+    computerGameBoard: receiveAttack(gameState.computerGameBoard, [row, col]),
+    isUserTurn: false,
   };
+}
+
+/**
+ * Attacks a random cell on the user's board
+ * @param {GameState} gameState - the current state of the game
+ * @returns {GameState} game state after attack has been processed
+ */
+export function processComputerAttack(gameState) {
+  let row, col;
+  const boardStates = getBoardStates(gameState.userGameBoard);
+  do {
+    row = Math.floor(Math.random() * 10);
+    col = Math.floor(Math.random() * 10);
+  } while (boardStates[row][col] === "hit" || boardStates[row][col] === "miss");
+  return {
+    ...gameState,
+    userGameBoard: receiveAttack(gameState.userGameBoard, [row, col]),
+    isUserTurn: true,
+  };
+}
+
+/**
+ * Checks if a game is over
+ * @param {GameState} gameState - the current state of the game
+ * @returns {boolean} true if game is over, false otherwise
+ */
+export function isGameOver(gameState) {
+  return (
+    areAllShipsSunk(gameState.userGameBoard) ||
+    areAllShipsSunk(gameState.computerGameBoard)
+  );
 }
