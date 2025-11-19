@@ -45,6 +45,12 @@ function createDisplayData() {
   };
 }
 
+/**
+ * Masks ship positions that haven't been hit, showing them as empty cells.
+ * Used to hide opponent's ship locations from the player's view.
+ * @param {CellState[][]} boardStates - 10x10 grid of cell states
+ * @returns {CellState[][]} Board states with "ship" replaced by "empty"
+ */
 function maskOpponentShips(boardStates) {
   return boardStates.map((row) =>
     row.map((state) => (state === "ship" ? "empty" : state)),
