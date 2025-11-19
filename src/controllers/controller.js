@@ -39,8 +39,16 @@ function updateScreen() {
 function createDisplayData() {
   return {
     userBoardStates: getBoardStates(gameState.userGameBoard),
-    computerBoardStates: getBoardStates(gameState.computerGameBoard),
+    computerBoardStates: maskOpponentShips(
+      getBoardStates(gameState.computerGameBoard),
+    ),
   };
+}
+
+function maskOpponentShips(boardStates) {
+  return boardStates.map((row) =>
+    row.map((state) => (state === "ship" ? "empty" : state)),
+  );
 }
 
 /**
