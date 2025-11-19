@@ -1,6 +1,11 @@
-import { createTemplateGame } from "../models/gameState";
+import {
+  createGame,
+  processUserAttack,
+  processComputerAttack,
+  isGameOver,
+} from "../models/gameState";
 import { getBoardStates } from "../models/gameBoard.js";
-import { renderGameState } from "../views/renderer";
+import { displayGame, onComputerCellClick } from "../views/renderer";
 
 /**
  * Represents the game state translated as display data for the view.
@@ -9,25 +14,68 @@ import { renderGameState } from "../views/renderer";
  * @property {CellState[][]} computerBoardStates - a 10x10 grid of cell states from the computer
  */
 
+let gameState;
+
+export function startGame() {
+  gameState = createGame();
+  updateScreen();
+}
+
 /**
- * TEMP: Will implement a system for allowing players to place their ships later
- * Sets up a game of battleship.
+ * Updates the screen to reflect the current state of the game.
+ * Called during initialization, and on every state change.
  * @returns {void}
  */
-export function startTemplateGame() {
-  const templateGame = createTemplateGame();
-  const displayData = createDisplayData(templateGame);
-  renderGameState(displayData);
+function updateScreen() {
+  const displayData = createDisplayData();
+  displayGame(displayData);
+  setUpGameHandlers();
 }
 
 /**
  * Translates game state into display-ready data
- * @param {GameState} gameState - the game to extract data from
  * @returns {DisplayData} display data
  */
-function createDisplayData(gameState) {
+function createDisplayData() {
   return {
-    userBoardStates: getBoardStates(gameState.user.gameBoard),
-    computerBoardStates: getBoardStates(gameState.computer.gameBoard),
+    userBoardStates: getBoardStates(gameState.userGameBoard),
+    computerBoardStates: getBoardStates(gameState.computerGameBoard),
   };
+}
+
+/**
+ * Connects game logic handlers to DOM events. Wires user interactions
+ * from the view to their corresponding game actions in the controller.
+ * @returns {void}
+ */
+function setUpGameHandlers() {
+  onComputerCellClick(handleUserAttack);
+}
+
+/**
+ * Attacks the cell at the given position on the computer's board
+ * @param {number} row - the row on the board where the cell was attacked
+ * @param {number} col - the column on the board where the cell was attacked
+ * @returns {void}
+ */
+function handleUserAttack(row, col) {
+  if (!gameState.isUserTurn) return;
+
+  try {
+    gameState = processUserAttack(gameState, row, col); // update reference
+    updateScreen();
+
+    if (!isGameOver(gameState)) {
+      setTimeout(() => {
+        gameState = processComputerAttack(gameState); // update reference
+        updateScreen();
+      }, 1000);
+    }
+  } catch (error) {
+    if (error.message === "This position has already been attacked") {
+      return; // Stay on user's turn, ignore the click
+    }
+
+    throw error;
+  }
 }

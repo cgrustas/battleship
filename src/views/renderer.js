@@ -6,12 +6,20 @@
  */
 
 /**
+ * @callback ComputerCellClickHandler
+ * @param {number} row - Row index of the clicked cell (0-9)
+ * @param {number} col - Column index of the clicked cell (0-9)
+ * @returns {void}
+ */
+
+/**
  * Displays a game of battleship on the page.
  * @param {DisplayData} displayData - the game state to display
  * @returns {void}
  */
-export function renderGameState(displayData) {
+export function displayGame(displayData) {
   const body = document.querySelector("body");
+  body.innerHTML = "";
   const battlefields = createBattlefields(
     displayData.userBoardStates,
     displayData.computerBoardStates,
@@ -98,6 +106,22 @@ function createBattlefieldGrid(boardStates) {
   });
 
   return grid;
+}
+
+/**
+ * Registers a call back when a computer cell is clicked
+ * @param {ComputerCellClickHandler} callback - function to call when a cell is clicked
+ * @returns {void}
+ */
+export function onComputerCellClick(callback) {
+  const computerCells = document.querySelectorAll(
+    ".computer .battlefield-cell",
+  );
+  computerCells.forEach((cell, index) => {
+    const row = Math.floor(index / 10);
+    const col = index % 10;
+    cell.addEventListener("click", () => callback(row, col));
+  });
 }
 
 /**

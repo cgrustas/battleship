@@ -31,3 +31,11 @@
 .battlefield-cell.ship {
   background-color: lightblue;
 }
+
+.battlefield-cell.hit {
+  background-color: red;
+}
+
+.battlefield-cell.miss {
+  background-color: lightcoral;
+}
