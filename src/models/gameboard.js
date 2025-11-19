@@ -24,10 +24,42 @@ import { validateShip, hit, isSunk } from "./ship.js";
  */
 
 /**
+ * Creates a game board with a random ship configuration.
+ * @param ships - the ships to place on the game board
+ * @returns {GameBoard}
+ */
+export function createRandomGameBoard(ships) {
+  // define the board
+  let board = createEmptyGameBoard();
+
+  ships.forEach((ship) => {
+    let placed = false;
+
+    // generate a random valid coordinate and a random direction (horizontal/vertical)
+    while (!placed) {
+      const row = Math.floor(Math.random() * 10);
+      const col = Math.floor(Math.random() * 10);
+      const isHorizontal = Math.random() < 0.5;
+
+      try {
+        board = placeShip(board, ship, [row, col], isHorizontal);
+        placed = true;
+      } catch {
+        // Try again
+      }
+    }
+  });
+
+  return board;
+}
+
+export function cycleGameBoard() {}
+
+/**
  * Creates an empty game board for a player.
  * @returns {GameBoard} game board full of empty cells
  */
-export function createGameBoard() {
+export function createEmptyGameBoard() {
   const board = Array(10)
     .fill(null)
     .map(() =>
@@ -142,44 +174,6 @@ export function areAllShipsSunk(gameBoard) {
     if (!isSunk(ship)) return false;
   }
   return true;
-}
-
-/**
- * Gets the positions of the board where a player has attacked and missed.
- * @returns {Position[]} board misses
- * @param {GameBoard} gameBoard - the board to retrieve misses from
- */
-export function getMisses(gameBoard) {
-  validateGameBoard(gameBoard);
-  const misses = [];
-  for (let i = 0; i < 10; i++) {
-    for (let j = 0; j < 10; j++) {
-      const cell = gameBoard.board[i][j];
-      if (isMiss(cell)) {
-        misses.push([i, j]);
-      }
-    }
-  }
-  return misses;
-}
-
-/**
- * Gets the positions of the board where a player has attacked and hit a ship.
- * @returns {Position[]} board hits
- * @param {GameBoard} gameBoard - the board to retrieve hits from
- */
-export function getHits(gameBoard) {
-  validateGameBoard(gameBoard);
-  const hits = [];
-  for (let i = 0; i < 10; i++) {
-    for (let j = 0; j < 10; j++) {
-      const cell = gameBoard.board[i][j];
-      if (isHit(cell)) {
-        hits.push([i, j]);
-      }
-    }
-  }
-  return hits;
 }
 
 /**
