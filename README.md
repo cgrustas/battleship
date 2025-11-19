@@ -22,7 +22,7 @@ Each board contains the Milton Bradley fleet composition:
 - **Immutable data structures** using `Object.freeze()` to prevent mutation, but more so treating objects as immutable
 - **Composition over inheritance** avoiding class hierarchies in favor of function composition (was especially helpful with the user/computer player functionality)
 
-### Test-Driven Development (TDD)
+### Test-Driven Development
 
 - **Comprehensive test coverage** for all public APIs
 - **Knowing what to test** tested incoming queries by making assertions about what they return
@@ -32,7 +32,7 @@ Each board contains the Milton Bradley fleet composition:
 
 ### Software Architecture
 
-- **Model-View-Controller (MVC) pattern**
+- **Model-View-Controller pattern**
 - **Module organization** with one responsibility per module. I elected to not create objects for single instances (controller, view)
 - **Minimal coupling** between components for better testability
 - **Defensive programming** with thorough input validation
