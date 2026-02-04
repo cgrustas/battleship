@@ -1,6 +1,6 @@
 # Battleship
 
-An implementation of the classic Battleship game, built as part of [The Odin Project](https://www.theodinproject.com/) curriculum.
+An implementation of the classic Battleship game, built as part of [The Odin Project](https://www.theodinproject.com/) curriculum. See [Live Demo](https://cgrustas.github.io/battleship/) here.
 
 ## Overview
 
